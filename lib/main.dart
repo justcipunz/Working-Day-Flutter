@@ -8,7 +8,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:test/auth/domain/auth_manager.dart';
 import 'package:test/calendar/screens/calendar_screen.dart';
-import 'package:test/safe_area.dart';
 import 'package:test/start/screens/nav_bar.dart';
 import 'package:test/notifications/screens/notification_screen.dart';
 import 'package:test/profile/screens/profile_screen.dart';
@@ -29,19 +28,19 @@ void main() async {
 
   HttpOverrides.global = _MyHttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  await FirebaseAPI().initNotifications();
-  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    analytics.logEvent(
-      name: 'notification_received',
-      parameters: {
-        'title': message.notification?.title,
-        'body': message.notification?.body,
-      },
-    );
-  });
+  // await Firebase.initializeApp();
+  // await FirebaseAPI().initNotifications();
+  // FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+  //   analytics.logEvent(
+  //     name: 'notification_received',
+  //     parameters: {
+  //       'title': message.notification?.title ?? '',
+  //       'body': message.notification?.body ?? '',
+  //     },
+  //   );
+  // });
 
   await UserPreferences.init();
   bool isAuthenticated = await checkToken();
