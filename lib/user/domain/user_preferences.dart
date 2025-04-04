@@ -47,7 +47,7 @@ class UserPreferences {
       throw Exception('Токен не существует');
     }
 
-    var url = Uri.parse('https://working-day.online:8080/v1/employee/info');
+    var url = Uri.parse('https://working-day.su:8080/v1/employee/info');
     var headers = {
       'Authorization': 'Bearer $token',
     };
@@ -68,7 +68,7 @@ class UserPreferences {
       throw Exception('Токен не существует');
     }
 
-    var url = Uri.parse('https://working-day.online:8080/v1/employee/info')
+    var url = Uri.parse('https://working-day.su:8080/v1/employee/info')
         .replace(queryParameters: {'employee_id': userId});
     var headers = {'Authorization': 'Bearer $token'};
 
@@ -89,7 +89,7 @@ class UserPreferences {
       throw Exception('Токен не существует');
     }
 
-    var url = Uri.parse('https://working-day.online:8080/v1/actions');
+    var url = Uri.parse('https://working-day.su:8080/v1/actions');
     var headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',

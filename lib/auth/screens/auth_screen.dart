@@ -134,7 +134,9 @@ class AuthScreenState extends ConsumerState<AuthScreen> {
                 if (success) {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (context) => const MyApp(isAuthenticated: true),
+                      builder: (context) => const MyApp(
+                        isAuthenticated: true
+                        ),
                     ),
                   );
                 } else {

@@ -1,0 +1,143 @@
+import 'package:flutter/material.dart';
+import 'navigation_bar.dart';
+
+class TaskPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          const SizedBox(height: 40),
+          MyNavigationBar(
+            currentIndex: 1,
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildTaskHeader(),
+                  const SizedBox(height: 30),
+                  _buildTaskInfoSection(),
+                  const SizedBox(height: 30),
+                  _buildDescriptionSection(),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTaskHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Создать макет в Figma",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey[800],
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Icon(Icons.error_outline, color: Colors.orange[700], size: 20),
+            const SizedBox(width: 8),
+            Text(
+              "В работе",
+              style: TextStyle(
+                color: Colors.orange[700],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTaskInfoSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildInfoRow(
+            Icons.work_outline, "Проект:", "Курсовая работа \"Трекер Задач\""),
+        const SizedBox(height: 15),
+        _buildInfoRow(Icons.person_outline, "Ответственный:",
+            "@akazhkarimov - Асхат Кажкаримов"),
+        const SizedBox(height: 15),
+        _buildInfoRow(
+            Icons.calendar_today, "Дедлайн:", "09/12/2024 → 13/12/2024"),
+        const SizedBox(height: 15),
+        _buildInfoRow(
+            Icons.supervisor_account, "Куратор:", "@iisypov - Ilya Isypov"),
+      ],
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, color: Colors.grey[600], size: 22),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: TextStyle(
+                  color: Colors.grey[800],
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDescriptionSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Описание задачи",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey[800],
+          ),
+        ),
+        const SizedBox(height: 15),
+        Text(
+          "В рамках задачи необходимо разработать анимированный макет в Figma. "
+          "Дизайн использовать в соответствии с ТЗ. Создать несколько вкладок: "
+          "домашняя страница, страница управления проектом, страница редактирования задачи. "
+          "Разработка с учетом утвержденных правок и договоренностей.",
+          style: TextStyle(
+            color: Colors.grey[700],
+            fontSize: 16,
+            height: 1.4,
+          ),
+        ),
+      ],
+    );
+  }
+}

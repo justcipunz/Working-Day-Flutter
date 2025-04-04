@@ -17,6 +17,7 @@ import 'package:test/start/screens/start_screen.dart';
 import 'package:test/user/domain/firebase_api.dart';
 import 'package:test/user/domain/user_preferences.dart';
 import 'package:test/user/domain/user_preferences_wrapper.dart';
+import 'tracker/screens/home_page.dart';
 
 final userPreferencesProvider = Provider<UserPreferencesWrapper>((ref) {
   return UserPreferencesWrapper();
@@ -44,10 +45,13 @@ void main() async {
 
   await UserPreferences.init();
   bool isAuthenticated = await checkToken();
+  // bool isAuthenticated = true;
 
   runApp(
     ProviderScope(
-      child: MyApp(isAuthenticated: isAuthenticated),
+      child: MyApp(
+        isAuthenticated: isAuthenticated
+        ),
     ),
   );
 }
@@ -135,3 +139,14 @@ class Home extends ConsumerWidget {
     );
   }
 }
+
+// class MyApp extends ConsumerWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     return MaterialApp(
+//       home: HomePage(),
+//     );
+//   }
+// }
