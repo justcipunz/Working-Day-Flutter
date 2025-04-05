@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:test/tracker/screens/section_title.dart';
 import 'navigation_bar.dart';
+import 'task.dart';
 
 class TaskPage extends StatelessWidget {
+  final Task task;
+
+  const TaskPage({super.key, required this.task});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,8 +19,6 @@ class TaskPage extends StatelessWidget {
           ),
           Expanded(
             child: SingleChildScrollView(
-              // padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-              // padding: const EdgeInsets.all(20),
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,12 +42,16 @@ class TaskPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SectionTitle.large(
-          text: "Создать макет в Figma",
-          padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+          text: task.title,
+          padding: const EdgeInsets.symmetric(vertical: 10),
         ),
         Row(
           children: [
-            Icon(Icons.error_outline, color: Colors.orange[700], size: 20),
+            Icon(
+              Icons.error_outline, 
+              color: Colors.orange[700], 
+              size: 20
+            ),
             const SizedBox(width: 8),
             Text(
               "В работе",
@@ -63,17 +70,25 @@ class TaskPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildInfoRow(
-            Icons.work_outline, "Проект:", "Курсовая работа \"Трекер Задач\""),
-        const SizedBox(height: 15),
-        _buildInfoRow(Icons.person_outline, "Ответственный:",
-            "@akazhkarimov - Асхат Кажкаримов"),
+        _buildInfoRow(Icons.work_outline, "Проект:", task.project),
         const SizedBox(height: 15),
         _buildInfoRow(
-            Icons.calendar_today, "Дедлайн:", "09/12/2024 → 13/12/2024"),
+          Icons.person_outline, 
+          "Ответственный:", 
+          task.responsible
+        ),
         const SizedBox(height: 15),
         _buildInfoRow(
-            Icons.supervisor_account, "Куратор:", "@iisypov - Ilya Isypov"),
+          Icons.calendar_today, 
+          "Дедлайн:", 
+          "${task.startDate} → ${task.endDate}"
+        ),
+        const SizedBox(height: 15),
+        _buildInfoRow(
+          Icons.supervisor_account, 
+          "Куратор:", 
+          task.curator
+        ),
       ],
     );
   }
@@ -125,10 +140,7 @@ class TaskPage extends StatelessWidget {
         ),
         const SizedBox(height: 15),
         Text(
-          "В рамках задачи необходимо разработать анимированный макет в Figma. "
-          "Дизайн использовать в соответствии с ТЗ. Создать несколько вкладок: "
-          "домашняя страница, страница управления проектом, страница редактирования задачи. "
-          "Разработка с учетом утвержденных правок и договоренностей.",
+          task.description,
           style: TextStyle(
             color: Colors.grey[700],
             fontSize: 16,

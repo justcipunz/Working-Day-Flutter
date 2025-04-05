@@ -361,17 +361,22 @@ class _KanbanColumn extends StatelessWidget {
 
   Widget _buildTaskCard(int index) {
     final task = Task(
-      "Задача ${index + 1}",
-      "09/12/2024",
-      "14/12/2024",
-      "Проект",
-      index % 3 == 0 ? "Срочно!" : "",
-      index % 3 == 0,
+      title: "Задача ${index + 1}",
+      startDate: "09/12/2024",
+      endDate: "14/12/2024",
+      project: "Проект",
+      timeLeft: index % 3 == 0 ? "Срочно!" : "",
+      isUrgent: index % 3 == 0,
+      responsible: "Ответственный ${index + 1}",
+      curator: "Куратор ${index + 1}",
+      description: "Описание задачи ${index + 1}",
     );
 
     return TaskCard(
       task: task,
       isUrgent: task.isUrgent,
+      showProject: false,
+      showResponsible: true,
     );
   }
 

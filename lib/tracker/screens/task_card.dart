@@ -6,12 +6,16 @@ class TaskCard extends StatelessWidget {
   final Task task;
   final bool isUrgent;
   final VoidCallback? onTap;
+  final bool showProject;
+  final bool showResponsible;
 
   const TaskCard({
     super.key,
     required this.task,
     required this.isUrgent,
     this.onTap,
+    this.showProject = true,
+    this.showResponsible = false,
   });
 
   @override
@@ -25,9 +29,9 @@ class TaskCard extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
-        onTap: onTap ?? () => Navigator.pushReplacement(
+        onTap: onTap ?? () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => TaskPage()),
+          MaterialPageRoute(builder: (context) => TaskPage(task: task)),
         ),
         child: Container(
           padding: const EdgeInsets.all(15),
@@ -40,8 +44,6 @@ class TaskCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  // const Icon(Icons.check_box_outline_blank, color: Colors.white),
-                  // const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       task.title,
@@ -74,24 +76,17 @@ class TaskCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Icon(Icons.work_outline, size: 16, color: Colors.white),
-                  const SizedBox(width: 5),
-                  Flexible(
-                    child: Text(
-                      task.project,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.white,
-                        fontFamily: 'Cera Pro',
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              if (showProject || showResponsible) const SizedBox(height: 8),
+              if (showProject)
+                _buildInfoRow(
+                  icon: Icons.work_outline,
+                  text: task.project,
+                ),
+              if (showResponsible)
+                _buildInfoRow(
+                  icon: Icons.person_outline,
+                  text: task.responsible,
+                ),
               if (isUrgent && task.timeLeft.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
@@ -109,6 +104,26 @@ class TaskCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildInfoRow({required IconData icon, required String text}) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: Colors.white),
+        const SizedBox(width: 5),
+        Flexible(
+          child: Text(
+            text,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.white,
+              fontFamily: 'Cera Pro',
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
