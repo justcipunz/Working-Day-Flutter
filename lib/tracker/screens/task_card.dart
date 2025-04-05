@@ -16,24 +16,19 @@ class TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap ?? () {
-        Navigator.push(
+    return Card(
+      margin: EdgeInsets.zero,
+      color: isUrgent ? const Color(0xFF941616) : const Color(0xFF164F94),
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: onTap ?? () => Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => TaskPage(
-              // task: task
-              ),
-          ),
-        );
-      },
-      child: Card(
-        margin: EdgeInsets.zero,
-        color: isUrgent ? const Color(0xFF941616) : const Color(0xFF164F94),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+          MaterialPageRoute(builder: (context) => TaskPage()),
         ),
-        elevation: 4,
         child: Container(
           padding: const EdgeInsets.all(15),
           constraints: BoxConstraints(
@@ -45,8 +40,8 @@ class TaskCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.check_box_outline_blank, color: Colors.white),
-                  const SizedBox(width: 8),
+                  // const Icon(Icons.check_box_outline_blank, color: Colors.white),
+                  // const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       task.title,

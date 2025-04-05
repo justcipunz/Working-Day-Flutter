@@ -5,6 +5,8 @@ import 'package:test/services/screens/documents_screen.dart';
 import 'package:test/services/screens/payments_screen.dart';
 import 'package:test/user/domain/user_preferences.dart';
 
+import '../../tracker/screens/home_page.dart';
+
 class ServicesPage extends StatelessWidget {
   ServicesPage({Key? key}) : super(key: key);
 
@@ -44,6 +46,9 @@ class ServicesPage extends StatelessWidget {
                 break;
               case '/attendance':
                 builder = (BuildContext _) => const AttendanceScreen();
+                break;
+              case '/tracker':
+                builder = (BuildContext _) => HomePage();
                 break;
               default:
                 throw Exception('Invalid route: ${settings.name}');
@@ -86,6 +91,12 @@ class ServicesPage extends StatelessWidget {
                 'assets/images/vacation_icon.png',
                 'Отпуска',
                 '/absence',
+              ),
+              _buildServiceButton(
+                context,
+                'assets/images/documents_icon.png',
+                'Трекер задач',
+                '/tracker',
               ),
               if (role == 'manager')
                 _buildServiceButton(

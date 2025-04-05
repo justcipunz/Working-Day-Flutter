@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'navigation_bar.dart';
+import 'section_title.dart';
 import 'task.dart';
 import 'task_card.dart';
 
@@ -22,7 +23,7 @@ class _ProjectPageState extends State<ProjectPage> {
     return Scaffold(
       body: Column(
         children: [
-          const SizedBox(height: 40),
+          const SizedBox(height: 20),
           MyNavigationBar(
             currentIndex: 2,
           ),
@@ -37,21 +38,31 @@ class _ProjectPageState extends State<ProjectPage> {
   }
 
   Widget _buildProjectList() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(20),
-      itemCount: projects.length,
-      itemBuilder: (context, index) => Card(
-        margin: const EdgeInsets.only(bottom: 15),
-        child: ListTile(
-          leading: const Icon(Icons.work_outline, size: 32),
-          title: Text(projects[index].name),
-          subtitle: projects[index].isAdmin
-              ? const Text("Администратор проекта",
-                  style: TextStyle(color: Colors.green))
-              : null,
-          onTap: () => setState(() => selectedProject = projects[index]),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionTitle.large(
+          text: "Ваши проекты",
         ),
-      ),
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            itemCount: projects.length,
+            itemBuilder: (context, index) => Card(
+              margin: const EdgeInsets.only(bottom: 15),
+              child: ListTile(
+                leading: const Icon(Icons.work_outline, size: 32),
+                title: Text(projects[index].name),
+                subtitle: projects[index].isAdmin
+                    ? const Text("Администратор проекта",
+                        style: TextStyle(color: Colors.green))
+                    : null,
+                onTap: () => setState(() => selectedProject = projects[index]),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -59,6 +70,7 @@ class _ProjectPageState extends State<ProjectPage> {
     return SingleChildScrollView(
       child: Column(
         children: [
+          SectionTitle.large(text: projects[0].name),
           _buildPhaseNavigation(),
           _currentSection == 0
               ? _buildKanbanBoard()
@@ -72,7 +84,7 @@ class _ProjectPageState extends State<ProjectPage> {
 
   Widget _buildPhaseNavigation() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -90,15 +102,18 @@ class _ProjectPageState extends State<ProjectPage> {
   }
 
   Widget _buildNavButton(String title, int index) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-          backgroundColor: _currentSection == index
-              ? const Color(0xFF164F94)
-              : const Color(0xFFEBECF0)),
-      onPressed: () => setState(() => _currentSection = index),
-      child: Text(title,
-          style: TextStyle(
-              color: _currentSection == index ? Colors.white : Colors.black)),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+            backgroundColor: _currentSection == index
+                ? const Color(0xFF164F94)
+                : const Color(0xFFEBECF0)),
+        onPressed: () => setState(() => _currentSection = index),
+        child: Text(title,
+            style: TextStyle(
+                color: _currentSection == index ? Colors.white : Colors.black)),
+      ),
     );
   }
 
@@ -126,32 +141,35 @@ class _ProjectPageState extends State<ProjectPage> {
   ];
 
   Widget _buildKanbanBoard() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final maxHeight = constraints.hasBoundedHeight
-            ? constraints.maxHeight * 0.8
-            : MediaQuery.of(context).size.height * 0.7;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final maxHeight = constraints.hasBoundedHeight
+              ? constraints.maxHeight * 0.8
+              : MediaQuery.of(context).size.height * 0.7;
 
-        return SizedBox(
-          height: maxHeight,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            physics: const BouncingScrollPhysics(),
-            itemCount: _kanbanColumns.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
-            itemBuilder: (context, index) {
-              final column = _kanbanColumns[index];
-              return _KanbanColumn(
-                status: column['status'] as String,
-                tasks: column['tasks'] as int,
-                color: column['color'] as Color,
-                maxHeight: constraints.maxHeight,
-              );
-            },
-          ),
-        );
-      },
+          return SizedBox(
+            height: maxHeight,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              physics: const BouncingScrollPhysics(),
+              itemCount: _kanbanColumns.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (context, index) {
+                final column = _kanbanColumns[index];
+                return _KanbanColumn(
+                  status: column['status'] as String,
+                  tasks: column['tasks'] as int,
+                  color: column['color'] as Color,
+                  maxHeight: constraints.maxHeight,
+                );
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -324,7 +342,6 @@ class _KanbanColumn extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-
             Flexible(
               child: tasks == 0
                   ? _buildEmptyState()

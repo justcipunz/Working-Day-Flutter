@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:test/tracker/screens/section_title.dart';
 import 'navigation_bar.dart';
 
 class TaskPage extends StatelessWidget {
@@ -7,13 +8,15 @@ class TaskPage extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          const SizedBox(height: 40),
+          const SizedBox(height: 20),
           MyNavigationBar(
             currentIndex: 1,
           ),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              // padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+              // padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -35,15 +38,10 @@ class TaskPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "Создать макет в Figma",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.grey[800],
-          ),
+        SectionTitle.large(
+          text: "Создать макет в Figma",
+          padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
         ),
-        const SizedBox(height: 10),
         Row(
           children: [
             Icon(Icons.error_outline, color: Colors.orange[700], size: 20),

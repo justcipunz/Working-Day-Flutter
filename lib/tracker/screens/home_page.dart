@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'navigation_bar.dart';
+import 'section_title.dart';
 import 'task.dart';
 import 'task_card.dart';
 
@@ -18,10 +19,9 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
       body: Column(
         children: [
-          const SizedBox(height: 40),
+          const SizedBox(height: 20),
           const MyNavigationBar(
             currentIndex: 0,
           ),
@@ -30,11 +30,14 @@ class HomePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20),
-                  _buildSectionTitle("Ваши ближайшие дедлайны:"),
+                  SectionTitle.large(
+                    text: "Ваши ближайшие дедлайны",
+                  ),
                   _buildDeadlineSection(),
-                  const SizedBox(height: 20),
-                  _buildSectionTitle("Все задачи"),
+                  // const SizedBox(height: 20),
+                  SectionTitle.large(
+                    text: "Все задачи",
+                  ),
                   _buildTaskList(),
                   const SizedBox(height: 20),
                 ],
@@ -42,20 +45,6 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          fontFamily: 'Cera Pro',
-        ),
       ),
     );
   }
