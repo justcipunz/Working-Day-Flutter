@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'project_page.dart';
-import 'task.dart';
+import '../data/task.dart';
 import 'task_page.dart';
 import 'home_page.dart';
 
@@ -25,6 +25,7 @@ class MyNavigationBar extends StatelessWidget {
             isUrgent: true,
             responsible: "@akazhkarimov - Асхат Кажкаримов",
             curator: "@iisypov - Ilya Isypov",
+            status: "В работе",
             description:
                 "В рамках задачи необходимо разработать анимированный макет...",
           ),

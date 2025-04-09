@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'navigation_bar.dart';
 import 'section_title.dart';
-import 'task.dart';
+import '../data/task.dart';
 import 'task_card.dart';
 
 class HomePage extends StatelessWidget {
@@ -15,6 +15,7 @@ class HomePage extends StatelessWidget {
       isUrgent: true,
       responsible: "@akazhkarimov - Асхат Кажкаримов",
       curator: "@iisypov - Ilya Isypov",
+      status: "В работе",
       description:
           "В рамках задачи необходимо разработать анимированный макет...",
     ),
@@ -24,11 +25,11 @@ class HomePage extends StatelessWidget {
       endDate: "10/04/2025",
       project: "Мобильное приложение для вуза",
       timeLeft: "Осталось менее суток!",
+      status: "В работе",
       isUrgent: false,
       responsible: "@akazhkarimov - Асхат Кажкаримов",
       curator: "@iisypov - Ilya Isypov",
-      description:
-          "Нужно решить задачу №2 по поводу...",
+      description: "Нужно решить задачу №2 по поводу...",
     ),
     Task(
       title: "Задача 3",
@@ -37,23 +38,13 @@ class HomePage extends StatelessWidget {
       project: "Курсовая работа 'Трекер задач'",
       timeLeft: "Осталось менее 1 часа!",
       isUrgent: false,
+      status: "В работе",
       responsible: "@akazhkarimov - Асхат Кажкаримов",
       curator: "@iisypov - Ilya Isypov",
       description:
           "В рамках задачи необходимо разработать анимированный макет...",
     ),
   ];
-// ];
-//   final List<Task> tasks = [
-//     Task("Создать макет в Figma", "09/12/2024", "13/12/2024",
-//         "Курсовая работа 'Трекер задач'", "Осталось менее 1 часа!", true),
-
-//     Task("Создать макет в Figma", "09/12/2024", "13/12/2024",
-//         "Курсовая работа 'Трекер задач'", "", false),
-//     Task("Создать макет в Figma", "09/12/2024", "13/12/2024",
-//         "Курсовая работа 'Трекер задач'", "", false),
-//   ];
-
   HomePage({super.key});
 
   @override
@@ -91,7 +82,7 @@ class HomePage extends StatelessWidget {
 
   Widget _buildDeadlineSection() {
     return SizedBox(
-      height: 160,
+      height: 170,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),

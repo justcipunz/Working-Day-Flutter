@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'task.dart';
+import '../data/task.dart';
 import 'task_page.dart';
 
 class TaskCard extends StatelessWidget {
@@ -29,10 +29,11 @@ class TaskCard extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
-        onTap: onTap ?? () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => TaskPage(task: task)),
-        ),
+        onTap: onTap ??
+            () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TaskPage(task: task)),
+                ),
         child: Container(
           padding: const EdgeInsets.all(15),
           constraints: BoxConstraints(
@@ -66,6 +67,24 @@ class TaskCard extends StatelessWidget {
                   Flexible(
                     child: Text(
                       "${task.startDate} → ${task.endDate}",
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.white,
+                        fontFamily: 'Cera Pro',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Icon(Icons.access_time, size: 16, color: Colors.white),
+                  const SizedBox(width: 5),
+                  Flexible(
+                    child: Text(
+                      task.status,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 14,

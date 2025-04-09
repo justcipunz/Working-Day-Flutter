@@ -7,6 +7,7 @@ class Task {
   final String responsible;
   final String curator;
   final String description;
+  final String status;
   final bool isUrgent;
 
   Task({
@@ -19,5 +20,6 @@ class Task {
     required this.curator,
     required this.description,
     required this.isUrgent,
+    required this.status,
   });
 }

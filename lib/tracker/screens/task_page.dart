@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:test/tracker/screens/section_title.dart';
 import 'navigation_bar.dart';
-import 'task.dart';
+import '../data/task.dart';
 
 class TaskPage extends StatelessWidget {
   final Task task;
@@ -54,7 +54,7 @@ class TaskPage extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              "В работе",
+              task.status,
               style: TextStyle(
                 color: Colors.orange[700],
                 fontWeight: FontWeight.w500,
