@@ -29,11 +29,7 @@ class TaskCard extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
-        onTap: onTap ??
-            () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => TaskPage(task: task)),
-                ),
+        onTap: onTap ?? () => _openTaskDetails(context),
         child: Container(
           padding: const EdgeInsets.all(15),
           constraints: BoxConstraints(
@@ -43,82 +39,27 @@ class TaskCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      task.title,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontFamily: 'Cera Pro',
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Icon(Icons.access_time, size: 16, color: Colors.white),
-                  const SizedBox(width: 5),
-                  Flexible(
-                    child: Text(
-                      "${task.startDate} → ${task.endDate}",
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.white,
-                        fontFamily: 'Cera Pro',
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Icon(Icons.access_time, size: 16, color: Colors.white),
-                  const SizedBox(width: 5),
-                  Flexible(
-                    child: Text(
-                      task.status,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.white,
-                        fontFamily: 'Cera Pro',
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              if (showProject || showResponsible) const SizedBox(height: 8),
-              if (showProject)
-                _buildInfoRow(
-                  icon: Icons.work_outline,
-                  text: task.project,
+              Text(
+                task.title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontFamily: 'Cera Pro',
                 ),
+              ),
+              const SizedBox(height: 8),
+
+              _buildInfoRow(Icons.access_time, 
+                "${task.startDate} → ${task.endDate}"),
+              
+              _buildInfoRow(Icons.circle, task.status),
+
+              if (showProject) 
+                _buildInfoRow(Icons.work_outline, task.projectName),
+
               if (showResponsible)
-                _buildInfoRow(
-                  icon: Icons.person_outline,
-                  text: task.responsible,
-                ),
-              if (isUrgent && task.timeLeft.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Text(
-                    task.timeLeft,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontFamily: 'Cera Pro',
-                    ),
-                  ),
-                ),
+                _buildInfoRow(Icons.person_outline, task.assignee),
             ],
           ),
         ),
@@ -126,23 +67,32 @@ class TaskCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow({required IconData icon, required String text}) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: Colors.white),
-        const SizedBox(width: 5),
-        Flexible(
-          child: Text(
-            text,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.white,
-              fontFamily: 'Cera Pro',
+  Widget _buildInfoRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: Colors.white),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.white,
+                fontFamily: 'Cera Pro',
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+
+  void _openTaskDetails(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => TaskPage(task: task)),
     );
   }
 }

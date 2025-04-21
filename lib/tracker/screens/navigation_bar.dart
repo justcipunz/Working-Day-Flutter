@@ -17,20 +17,20 @@ class MyNavigationBar extends StatelessWidget {
       0 => HomePage(),
       1 => TaskPage(
           task: Task(
-            title: "Создать макет в Figma",
+            id: "1",
+            title: "Задача 3",
             startDate: "09/12/2024",
             endDate: "13/12/2024",
-            project: "Курсовая работа 'Трекер задач'",
-            timeLeft: "Осталось менее 1 часа!",
+            projectName: "Мобильное приложение для вуза",
             isUrgent: true,
-            responsible: "@akazhkarimov - Асхат Кажкаримов",
-            curator: "@iisypov - Ilya Isypov",
+            assignee: "@akazhkarimov - Асхат Кажкаримов",
+            creator: "@iisypov - Ilya Isypov",
             status: "В работе",
-            description:
-                "В рамках задачи необходимо разработать анимированный макет...",
+            description: "Нужно решить задачу №2 по поводу...",
+            mediaLinks: List.empty(),
           ),
         ),
-      2 => ProjectPage(),
+      // 2 => ProjectPage(),
       _ => throw Exception('Invalid index'),
     };
 

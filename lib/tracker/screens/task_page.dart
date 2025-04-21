@@ -5,8 +5,13 @@ import '../data/task.dart';
 
 class TaskPage extends StatelessWidget {
   final Task task;
+  final bool isNew;
 
-  const TaskPage({super.key, required this.task});
+  const TaskPage({
+    super.key,
+    required this.task,
+    this.isNew = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -47,11 +52,7 @@ class TaskPage extends StatelessWidget {
         ),
         Row(
           children: [
-            Icon(
-              Icons.error_outline, 
-              color: Colors.orange[700], 
-              size: 20
-            ),
+            Icon(Icons.error_outline, color: Colors.orange[700], size: 20),
             const SizedBox(width: 8),
             Text(
               task.status,
@@ -70,25 +71,14 @@ class TaskPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildInfoRow(Icons.work_outline, "Проект:", task.project),
+        _buildInfoRow(Icons.work_outline, "Проект:", task.projectName),
         const SizedBox(height: 15),
-        _buildInfoRow(
-          Icons.person_outline, 
-          "Ответственный:", 
-          task.responsible
-        ),
+        _buildInfoRow(Icons.person_outline, "Ответственный:", task.assignee),
         const SizedBox(height: 15),
-        _buildInfoRow(
-          Icons.calendar_today, 
-          "Дедлайн:", 
-          "${task.startDate} → ${task.endDate}"
-        ),
+        _buildInfoRow(Icons.calendar_today, "Дедлайн:",
+            "${task.startDate} → ${task.endDate}"),
         const SizedBox(height: 15),
-        _buildInfoRow(
-          Icons.supervisor_account, 
-          "Куратор:", 
-          task.curator
-        ),
+        _buildInfoRow(Icons.supervisor_account, "Куратор:", task.creator),
       ],
     );
   }

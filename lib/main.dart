@@ -108,6 +108,7 @@ class MyApp extends ConsumerWidget {
         ],
         locale: const Locale('ru', 'RU'),
         home: isAuthorized ? const Home() : const StartScreen(),
+        debugShowCheckedModeBanner: false,
       ),
     );
   }

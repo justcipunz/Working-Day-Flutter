@@ -2,22 +2,23 @@ import 'task.dart';
 
 class Project {
   final String name;
+  final int tasksCount;
   final bool isAdmin;
-  int taskCount;
-  late List<Task> tasks;
+  List<Task> tasks;
 
   Project({
     required this.name,
+    required this.tasksCount,
     required this.isAdmin,
-    this.taskCount = 0,
     this.tasks = const [],
   });
 
-  void addTask(Task task) {
-    tasks.add(task);
-  }
-
-  void setTasks(List<Task> tasks) {
-    this.tasks = tasks; 
+  factory Project.fromJson(Map<String, dynamic> json) {
+    return Project(
+      name: json['project_name'],
+      tasksCount: json['tasks_count'],
+      isAdmin: json['is_admin'] ?? false,
+      tasks: List<Task>.from(json['tasks'].map((t) => Task.fromJson(t))),
+    );
   }
 }
