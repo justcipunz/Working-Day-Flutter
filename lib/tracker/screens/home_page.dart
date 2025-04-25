@@ -6,138 +6,6 @@ import 'section_title.dart';
 import '../data/task.dart';
 import 'task_card.dart';
 
-// class HomePage extends StatelessWidget {
-//   final List<Task> tasks = [
-//     Task(
-//       id: "1",
-//       title: "Создать макет в Figma",
-//       startDate: "09/12/2024",
-//       endDate: "13/12/2024",
-//       projectName: "Курсовая работа 'Трекер задач'",
-//       isUrgent: true,
-//       assignee: "@akazhkarimov - Асхат Кажкаримов",
-//       creator: "@iisypov - Ilya Isypov",
-//       status: "В работе",
-//       description:
-//           "В рамках задачи необходимо разработать анимированный макет...",
-//       mediaLinks: List.empty(),
-//     ),
-//     Task(
-//       id: "1",
-//       title: "Задача 2",
-//       startDate: "09/12/2024",
-//       endDate: "13/12/2024",
-//       projectName: "Курсовая работа 'Трекер задач'",
-//       isUrgent: true,
-//       assignee: "@akazhkarimov - Асхат Кажкаримов",
-//       creator: "@iisypov - Ilya Isypov",
-//       status: "В работе",
-//       description:
-//           "В рамках задачи необходимо разработать анимированный макет...",
-//       mediaLinks: List.empty(),
-//     ),
-//     Task(
-//       id: "1",
-//       title: "Создать макет в Figma",
-//       startDate: "09/12/2024",
-//       endDate: "13/12/2024",
-//       projectName: "Мобильное приложение для вуза",
-//       isUrgent: true,
-//       assignee: "@akazhkarimov - Асхат Кажкаримов",
-//       creator: "@iisypov - Ilya Isypov",
-//       status: "В работе",
-//       description:
-//           "Нужно решить задачу №2 по поводу...",
-//       mediaLinks: List.empty(),
-//     ),
-//     Task(
-//       id: "1",
-//       title: "Задача 3",
-//       startDate: "09/12/2024",
-//       endDate: "13/12/2024",
-//       projectName: "Мобильное приложение для вуза",
-//       isUrgent: true,
-//       assignee: "@akazhkarimov - Асхат Кажкаримов",
-//       creator: "@iisypov - Ilya Isypov",
-//       status: "В работе",
-//       description:
-//           "Нужно решить задачу №2 по поводу...",
-//       mediaLinks: List.empty(),
-//     ),
-//   ];
-//   HomePage({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Column(
-//         children: [
-//           const SizedBox(height: 20),
-//           const MyNavigationBar(
-//             currentIndex: 0,
-//           ),
-//           Expanded(
-//             child: SingleChildScrollView(
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   SectionTitle.large(
-//                     text: "Ваши ближайшие дедлайны",
-//                   ),
-//                   _buildDeadlineSection(),
-//                   // const SizedBox(height: 20),
-//                   SectionTitle.large(
-//                     text: "Все задачи",
-//                   ),
-//                   _buildTaskList(),
-//                   const SizedBox(height: 20),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Widget _buildDeadlineSection() {
-//     return SizedBox(
-//       height: 170,
-//       child: ListView.separated(
-//         scrollDirection: Axis.horizontal,
-//         padding: const EdgeInsets.symmetric(horizontal: 20),
-//         physics: const BouncingScrollPhysics(),
-//         itemCount: tasks.length,
-//         separatorBuilder: (context, index) => const SizedBox(width: 15),
-//         itemBuilder: (context, index) => SizedBox(
-//           width: 250,
-//           child: TaskCard(
-//             task: tasks[index],
-//             isUrgent: tasks[index].isUrgent,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _buildTaskList() {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(horizontal: 20),
-//       child: Column(
-//         children: tasks
-//             .map((task) => Padding(
-//                   padding: const EdgeInsets.only(bottom: 10),
-//                   child: TaskCard(
-//                     task: task,
-//                     isUrgent: task.isUrgent,
-//                   ),
-//                 ))
-//             .toList(),
-//       ),
-//     );
-//   }
-// }
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -156,8 +24,10 @@ class _HomePageState extends State<HomePage> {
 
   Future<List<Task>> _loadTasks() async {
     try {
-      final tasks = await TrackerService.getAllTasks();
-      return tasks;
+      final me = await UserPreferences.fetchProfileInfo();
+      print(me.id);
+      // return await TrackerService.getAssignedTasks(me.id!);
+      return await TrackerService.getAllTasks();
     } catch (e) {
       print('Ошибка загрузки задач: $e');
       rethrow;
@@ -167,25 +37,90 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Все задачи')),
       body: FutureBuilder<List<Task>>(
         future: _tasksFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return _buildErrorWidget(snapshot.error);
-          }
-
-          final tasks = snapshot.data ?? [];
-          if (tasks.isEmpty) {
-            return const Center(child: Text('Нет активных задач'));
-          }
-
-          return _buildTaskList(tasks);
+          return Column(
+            children: [
+              const SizedBox(height: 20),
+              const MyNavigationBar(currentIndex: 0),
+              Expanded(
+                child: _buildContent(snapshot),
+              ),
+            ],
+          );
         },
+      ),
+    );
+  }
+
+  Widget _buildContent(AsyncSnapshot<List<Task>> snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (snapshot.hasError) {
+      return _buildErrorWidget(snapshot.error);
+    }
+
+    final tasks = snapshot.data ?? [];
+    // tasks.sort((a, b) => a.timeLeft.compareTo(b.timeLeft));
+    tasks.sort((a, b) => a.title.compareTo(b.title)); // FIX LATER!!!!
+    if (tasks.isEmpty) {
+      return const Center(child: Text('Нет активных задач'));
+    }
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SectionTitle.large(text: "Ваши ближайшие дедлайны"),
+          _buildDeadlineSection(tasks),
+          SectionTitle.large(text: "Все задачи"),
+          _buildTaskList(tasks),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDeadlineSection(List<Task> tasks) {
+    final nearestTasks = tasks.take(3).toList();
+    
+    return SizedBox(
+      height: 170,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        physics: const BouncingScrollPhysics(),
+        itemCount: nearestTasks.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 15),
+        itemBuilder: (context, index) => SizedBox(
+          width: 250,
+          child: TaskCard(
+            task: nearestTasks[index],
+            isUrgent: nearestTasks[index].isUrgent,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTaskList(List<Task> tasks) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        children: tasks
+            .map((task) => Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: TaskCard(
+                    task: task,
+                    isUrgent: task.isUrgent,
+                    showProject: true,
+                    showResponsible: false,
+                  ),
+                ))
+            .toList(),
       ),
     );
   }
@@ -209,22 +144,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildTaskList(List<Task> tasks) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: tasks.length,
-      itemBuilder: (context, index) {
-        final task = tasks[index];
-        return TaskCard(
-          task: task,
-          isUrgent: task.isUrgent,
-          showProject: true,
-          showResponsible: true,
-        );
-      },
     );
   }
 }

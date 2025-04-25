@@ -28,6 +28,45 @@ class TrackerService {
     }
   }
 
+  static Future<List<Task>> getAssignedTasks(String employeeId) async {
+    final String? token = await UserPreferences.getToken();
+    if (token == null) {
+      throw Exception('Токен авторизации отсутствует');
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse(
+                'https://working-day.su:8080/v1/tracker/tasks/assigned_to_user')
+            .replace(queryParameters: {'employee_id': employeeId}),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      switch (response.statusCode) {
+        case 200:
+          final Map<String, dynamic> data = jsonDecode(response.body);
+          final List<dynamic> tasksJson = data['tasks'];
+          return tasksJson.map((json) => Task.fromJson(json)).toList();
+
+        case 400:
+          final error =
+              jsonDecode(response.body)['message'] ?? 'Неверный запрос';
+          throw Exception('Ошибка 400: $error');
+
+        case 404:
+          throw Exception('Задачи для пользователя $employeeId не найдены');
+
+        default:
+          throw Exception(
+              'Ошибка ${response.statusCode}: ${response.reasonPhrase}');
+      }
+    } on FormatException {
+      throw Exception('Ошибка формата ответа от сервера');
+    } on http.ClientException {
+      throw Exception('Проблема с подключением к серверу');
+    }
+  }
+
   static Future<List<Project>> getProjects() async {
     final token = await UserPreferences.getToken();
     final response = await http.get(

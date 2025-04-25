@@ -11,6 +11,18 @@ class Task {
   final String endDate;
   final bool isUrgent;
 
+  String get project => projectName; 
+  int get timeLeft => _calculateTimeLeft();
+  String get curator => creator; 
+  String get responsible => assignee;
+
+  int _calculateTimeLeft() {
+    final end = DateTime.parse(endDate);
+    final now = DateTime.now();
+    final difference = end.difference(now);
+    return difference.inHours;
+  }
+
   Task({
     required this.id,
     required this.title,
@@ -24,6 +36,7 @@ class Task {
     required this.endDate,
     required this.isUrgent,
   });
+
   factory Task.fromJson(Map<String, dynamic> json) {
     return Task(
       id: (json['id'] as String?)?.isNotEmpty == true ? json['id']! : 'no-id',
