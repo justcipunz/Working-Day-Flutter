@@ -30,7 +30,7 @@ class MyNavigationBar extends StatelessWidget {
             mediaLinks: List.empty(),
           ),
         ),
-      // 2 => ProjectPage(),
+      2 => ProjectPage(),
       _ => throw Exception('Invalid index'),
     };
 

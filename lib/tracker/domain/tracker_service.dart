@@ -21,10 +21,10 @@ class TrackerService {
       final List<dynamic> tasksJson = data['tasks'];
       print(tasksJson);
       var tasks = tasksJson.map((json) => Task.fromJson(json)).toList();
-      print(tasks[2].projectName);
       return tasks;
     } else {
-      throw Exception('Ошибка загрузки задач: ${response.statusCode}');
+      throw Exception(
+          'Ошибка загрузки задач ${response.statusCode}: ${response.reasonPhrase}');
     }
   }
 
@@ -67,19 +67,33 @@ class TrackerService {
     }
   }
 
-  static Future<List<Project>> getProjects() async {
-    final token = await UserPreferences.getToken();
+  static Future<List<Project>> getAllProjects() async {
+    final String? token = await UserPreferences.getToken();
+    if (token == null) {
+      throw Exception('Токен авторизации отсутствует');
+    }
+
     final response = await http.get(
       Uri.parse('https://working-day.su:8080/v1/tracker/projects/list'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body)['projects'] as List;
-      return data.map((json) => Project.fromJson(json)).toList();
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      final List<dynamic> projectsJson = data['projects'];
+      print(projectsJson);
+      final projectsList =
+          projectsJson.map((json) => Project.fromJson(json)).toList();
+      return projectsList;
     } else {
-      throw Exception('Ошибка загрузки проектов');
+      throw Exception(
+          'Ошибка загрузки проектов ${response.statusCode}: ${response.reasonPhrase}');
     }
+  }
+
+  static Future<List<Task>> getTasksByProject(String projectName) async {
+    final allTasks = await getAllTasks();
+    return allTasks.where((task) => task.projectName == projectName).toList();
   }
 
   static Future<void> createProject(String projectName) async {

@@ -24,8 +24,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<List<Task>> _loadTasks() async {
     try {
-      final me = await UserPreferences.fetchProfileInfo();
-      print(me.id);
+      // final me = await UserPreferences.fetchProfileInfo();
+      // print(me.id);
       // return await TrackerService.getAssignedTasks(me.id!);
       return await TrackerService.getAllTasks();
     } catch (e) {

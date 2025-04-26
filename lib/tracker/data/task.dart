@@ -1,15 +1,15 @@
 class Task {
   final String id;
   final String title;
-  final String projectName; // fix later!!!!
+  final String projectName;
   final String description;
   final String creator;
   final String assignee;
   final String status; // "Open", "InProgress", "Review", "Done"
-  final List<String> mediaLinks;
   final String startDate;
   final String endDate;
   final bool isUrgent;
+  final List<String>? mediaLinks;
 
   String get project => projectName; 
   int get timeLeft => _calculateTimeLeft();
@@ -31,10 +31,10 @@ class Task {
     required this.creator,
     required this.assignee,
     required this.status,
-    required this.mediaLinks,
     required this.startDate,
     required this.endDate,
     required this.isUrgent,
+    this.mediaLinks,
   });
 
   factory Task.fromJson(Map<String, dynamic> json) {

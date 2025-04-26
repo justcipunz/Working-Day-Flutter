@@ -1,126 +1,126 @@
-// import 'package:flutter/material.dart';
-// import '../data/project.dart';
-// import '../data/task.dart';
-// import 'navigation_bar.dart';
-// import 'project_info.dart';
-// import 'section_title.dart';
+import 'package:flutter/material.dart';
+import '../../user/domain/user_preferences.dart';
+import '../data/project.dart';
+import '../data/task.dart';
+import '../domain/tracker_service.dart';
+import 'navigation_bar.dart';
+import 'project_info.dart';
+import 'section_title.dart';
 
-// class ProjectPage extends StatefulWidget {
-//   const ProjectPage({super.key});
+class ProjectPage extends StatefulWidget {
+  const ProjectPage({super.key});
 
-//   @override
-//   _ProjectPageState createState() => _ProjectPageState();
-// }
+  @override
+  _ProjectPageState createState() => _ProjectPageState();
+}
 
-// class _ProjectPageState extends State<ProjectPage> {
-//   Project? selectedProject;
-//   final List<Project> projects = [
-//     Project(
-//       name: "Курсовая работа \"Трекер задач\"",
-//       isAdmin: true,
-//       tasks: List.generate(
-//           10,
-//           (i) => Task(
-//                 title: "Задача ${i + 1}",
-//                 startDate: "09/12/2024",
-//                 endDate: "14/12/2024",
-//                 project: "Курсовая работа \"Трекер задач\"",
-//                 timeLeft: i % 3 == 0 ? "Срочно!" : "",
-//                 isUrgent: i % 3 == 0,
-//                 responsible: "Ответственный ${i + 1}",
-//                 curator: "Куратор ${i + 1}",
-//                 description: "Описание задачи ${i + 1}",
-//                 status: i < 4
-//                     ? "Новая"
-//                     : i < 7
-//                         ? "В работе"
-//                         : i < 9
-//                             ? "На рассмотрении"
-//                             : "Выполнено",
-//               )),
-//     ),
-//     Project(
-//       name: "Корпоративный мессенджер",
-//       isAdmin: false,
-//       tasks: List.generate(
-//           10,
-//           (i) => Task(
-//                 title: "Задача мессенджера ${i + 1}",
-//                 startDate: "${(i * 558) % 30}/12/2024",
-//                 endDate: "${(i * 558) % 30 + 1}/01/2025",
-//                 project: "Мессенджер ChakChat",
-//                 timeLeft: i % 3 == 0 ? "Срочно!" : "",
-//                 isUrgent: i % 3 == 0,
-//                 responsible: "Ответственный ${i + 1}",
-//                 curator: "Куратор ${i + 1}",
-//                 description: "Описание задачи ${i + 1}",
-//                 status: "В работе",
-//               )),
-//     ),
-//     Project(
-//       name: "Разработка игры на телефон",
-//       isAdmin: true,
-//       tasks: [
-//         Task(
-//           title: "Создать макет",
-//           startDate: "09/12/2024",
-//           endDate: "13/12/2024",
-//           project: "Курсовая работа",
-//           status: "Новая",
-//           timeLeft: "Осталось 3 дня",
-//           isUrgent: false,
-//           responsible: "@user1",
-//           curator: "@curator1",
-//           description: "Описание задачи",
-//         ),
-//       ],
-//     ),
-//   ];
+class _ProjectPageState extends State<ProjectPage> {
+  late Future<List<Project>> _projectsFuture;
+  Project? selectedProject;
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Column(
-//         children: [
-//           const SizedBox(height: 20),
-//           const MyNavigationBar(currentIndex: 2),
-//           Expanded(
-//             child: selectedProject == null
-//                 ? _buildProjectList()
-//                 : ProjectInfo(
-//                     project: selectedProject!,
-//                     onBack: () => setState(() => selectedProject = null),
-//                   ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
+  @override
+  void initState() {
+    super.initState();
+    _projectsFuture = _loadProjects();
+  }
 
-//   Widget _buildProjectList() {
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         const SectionTitle.large(text: "Ваши проекты"),
-//         Expanded(
-//           child: ListView.builder(
-//             padding: const EdgeInsets.symmetric(horizontal: 20),
-//             itemCount: projects.length,
-//             itemBuilder: (context, index) => Card(
-//               margin: const EdgeInsets.only(bottom: 15),
-//               child: ListTile(
-//                 leading: const Icon(Icons.work_outline, size: 32),
-//                 title: Text(projects[index].name),
-//                 subtitle: projects[index].isAdmin
-//                     ? const Text("Администратор проекта",
-//                         style: TextStyle(color: Colors.green))
-//                     : null,
-//                 onTap: () => setState(() => selectedProject = projects[index]),
-//               ),
-//             ),
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }
+  Future<List<Project>> _loadProjects() async {
+    try {
+      return await TrackerService.getAllProjects();
+    } catch (e) {
+      print('Ошибка загрузки проектов: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: FutureBuilder<List<Project>>(
+        future: _projectsFuture,
+        builder: (context, snapshot) {
+          return Column(
+            children: [
+              const SizedBox(height: 20),
+              const MyNavigationBar(currentIndex: 2),
+              Expanded(
+                child: _buildContent(snapshot),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildContent(AsyncSnapshot<List<Project>> snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (snapshot.hasError) {
+      return _buildErrorWidget(snapshot.error);
+    }
+
+    final projects = snapshot.data ?? [];
+    if (projects.isEmpty) {
+      return const Center(child: Text('Нет доступных проектов'));
+    }
+
+    return selectedProject == null
+        ? _buildProjectList(projects)
+        : ProjectInfo(
+            project: selectedProject!,
+            onBack: () => setState(() => selectedProject = null),
+          );
+  }
+
+  Widget _buildProjectList(List<Project> projects) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionTitle.large(text: "Ваши проекты"),
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            itemCount: projects.length,
+            itemBuilder: (context, index) => Card(
+              margin: const EdgeInsets.only(bottom: 15),
+              child: ListTile(
+                leading: const Icon(Icons.work_outline, size: 32),
+                title: Text(projects[index].name),
+                subtitle: projects[index].isAdmin
+                    ? const Text("Администратор проекта",
+                        style: TextStyle(color: Colors.green))
+                    : null,
+                onTap: () => setState(() => selectedProject = projects[index]),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildErrorWidget(Object? error) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline, size: 50, color: Colors.red),
+          const SizedBox(height: 20),
+          Text(
+            'Ошибка загрузки проектов: ${error?.toString() ?? "Неизвестная ошибка"}',
+            style: const TextStyle(color: Colors.red),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () => setState(() => _projectsFuture = _loadProjects()),
+            child: const Text('Повторить попытку'),
+          ),
+        ],
+      ),
+    );
+  }
+}
