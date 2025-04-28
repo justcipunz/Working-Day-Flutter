@@ -11,9 +11,9 @@ class Task {
   final bool isUrgent;
   final List<String>? mediaLinks;
 
-  String get project => projectName; 
+  String get project => projectName;
   int get timeLeft => _calculateTimeLeft();
-  String get curator => creator; 
+  String get curator => creator;
   String get responsible => assignee;
 
   int _calculateTimeLeft() {
@@ -73,5 +73,10 @@ class Task {
       default:
         return 'Новая';
     }
+  }
+
+  @override
+  String toString() {
+    return "TASK: $title; TASK_ID: $id; PROJECT: $projectName";
   }
 }

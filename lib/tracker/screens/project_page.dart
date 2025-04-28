@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../user/domain/user_preferences.dart';
 import '../data/project.dart';
-import '../data/task.dart';
 import '../domain/tracker_service.dart';
 import 'navigation_bar.dart';
 import 'project_info.dart';

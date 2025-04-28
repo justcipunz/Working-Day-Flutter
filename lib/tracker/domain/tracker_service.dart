@@ -93,7 +93,12 @@ class TrackerService {
 
   static Future<List<Task>> getTasksByProject(String projectName) async {
     final allTasks = await getAllTasks();
-    return allTasks.where((task) => task.projectName == projectName).toList();
+    final tasksByProject =
+        allTasks.where((task) => task.projectName == projectName).toList();
+    for (var task in tasksByProject) {
+      print(task);
+    }
+    return tasksByProject;
   }
 
   static Future<void> createProject(String projectName) async {
@@ -109,22 +114,6 @@ class TrackerService {
 
     if (response.statusCode != 200) {
       throw Exception('Ошибка создания проекта');
-    }
-  }
-
-  static Future<List<Task>> getUserTasks(String userId) async {
-    final token = await UserPreferences.getToken();
-    final response = await http.get(
-      Uri.parse(
-          'https://working-day.su:8080/v1/tracker/tasks/assigned-to-user?employee_id=$userId'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body)['tasks'] as List;
-      return data.map((json) => Task.fromJson(json)).toList();
-    } else {
-      throw Exception('Ошибка загрузки задач');
     }
   }
 }

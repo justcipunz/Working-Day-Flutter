@@ -1,5 +1,3 @@
-import 'task.dart';
-
 class Project {
   final String name;
   final int tasksCount;
