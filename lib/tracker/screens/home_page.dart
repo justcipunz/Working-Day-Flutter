@@ -5,6 +5,7 @@ import 'navigation_bar.dart';
 import 'section_title.dart';
 import '../data/task.dart';
 import 'task_card.dart';
+import 'data_generator.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,10 +25,10 @@ class _HomePageState extends State<HomePage> {
 
   Future<List<Task>> _loadTasks() async {
     try {
-      // final me = await UserPreferences.fetchProfileInfo();
-      // print(me.id);
+      final me = await UserPreferences.fetchProfileInfo();
+      print(me.id);
       // return await TrackerService.getAssignedTasks(me.id!);
-      return await TrackerService.getAllTasks();
+      return await TrackerService.getTasksByUser(me.id!);
     } catch (e) {
       print('Ошибка загрузки задач: $e');
       rethrow;
@@ -56,7 +57,8 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildContent(AsyncSnapshot<List<Task>> snapshot) {
     if (snapshot.connectionState == ConnectionState.waiting) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+          child: CircularProgressIndicator(color: Color(0xFF164F94)));
     }
 
     if (snapshot.hasError) {
@@ -65,7 +67,7 @@ class _HomePageState extends State<HomePage> {
 
     final tasks = snapshot.data ?? [];
     // tasks.sort((a, b) => a.timeLeft.compareTo(b.timeLeft));
-    tasks.sort((a, b) => a.title.compareTo(b.title)); // FIX LATER!!!!
+    tasks.sort((a, b) => -a.title.compareTo(b.title)); // FIX LATER!!!!
     if (tasks.isEmpty) {
       return const Center(child: Text('Нет активных задач'));
     }
@@ -86,7 +88,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildDeadlineSection(List<Task> tasks) {
     final nearestTasks = tasks.take(3).toList();
-    
+
     return SizedBox(
       height: 170,
       child: ListView.separated(

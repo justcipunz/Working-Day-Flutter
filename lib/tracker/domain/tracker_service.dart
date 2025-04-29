@@ -17,10 +17,19 @@ class TrackerService {
     );
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = jsonDecode(response.body);
+      var responseBody = utf8.decode(response.bodyBytes);
+      final Map<String, dynamic> data = jsonDecode(responseBody);
       final List<dynamic> tasksJson = data['tasks'];
       print(tasksJson);
       var tasks = tasksJson.map((json) => Task.fromJson(json)).toList();
+      for (var task in tasks) {
+        task.startDate =
+            "${task.title.length * 13 % 27 + 1}/${task.title.length * 13 % 11 + 1}/2025";
+        task.endDate =
+            "${task.title.length * 21 % 27 + 1}/${task.title.length * 21 % 11 + 1}/2026";
+        var taskInfo = await TrackerService.getTaskInfo(task.id);
+        task.status = taskInfo.status;
+      }
       return tasks;
     } else {
       throw Exception(
@@ -39,12 +48,18 @@ class TrackerService {
           .replace(queryParameters: {'task_id': taskId}),
       headers: {'Authorization': 'Bearer $token'},
     );
+    var responseBody = utf8.decode(response.bodyBytes);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = jsonDecode(response.body);
-      return Task.fromJson(data);
+      final Map<String, dynamic> data = jsonDecode(responseBody);
+      var task = Task.fromJson(data);
+      task.startDate =
+          "${task.title.length * 13 % 27 + 1}/${task.title.length * 13 % 11 + 1}/2025";
+      task.endDate =
+          "${task.title.length * 21 % 27 + 1}/${task.title.length * 21 % 11 + 1}/2026";
+      return task;
     } else if (response.statusCode == 400) {
-      final errorData = jsonDecode(response.body);
+      final errorData = jsonDecode(responseBody);
       throw Exception('Некорректный запрос: ${errorData['message']}');
     } else if (response.statusCode == 404) {
       throw Exception('Задача с ID $taskId не найдена');
@@ -68,15 +83,16 @@ class TrackerService {
         headers: {'Authorization': 'Bearer $token'},
       );
 
+      var responseBody = utf8.decode(response.bodyBytes);
       switch (response.statusCode) {
         case 200:
-          final Map<String, dynamic> data = jsonDecode(response.body);
+          final Map<String, dynamic> data = jsonDecode(responseBody);
           final List<dynamic> tasksJson = data['tasks'];
           return tasksJson.map((json) => Task.fromJson(json)).toList();
 
         case 400:
           final error =
-              jsonDecode(response.body)['message'] ?? 'Неверный запрос';
+              jsonDecode(responseBody)['message'] ?? 'Неверный запрос';
           throw Exception('Ошибка 400: $error');
 
         case 404:
@@ -103,9 +119,10 @@ class TrackerService {
       Uri.parse('https://working-day.su:8080/v1/tracker/projects/list'),
       headers: {'Authorization': 'Bearer $token'},
     );
+    var responseBody = utf8.decode(response.bodyBytes);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = jsonDecode(response.body);
+      final Map<String, dynamic> data = jsonDecode(responseBody);
       final List<dynamic> projectsJson = data['projects'];
       print(projectsJson);
       final projectsList =
@@ -121,6 +138,16 @@ class TrackerService {
     final allTasks = await getAllTasks();
     final tasksByProject =
         allTasks.where((task) => task.projectName == projectName).toList();
+    for (var task in tasksByProject) {
+      print(task);
+    }
+    return tasksByProject;
+  }
+
+  static Future<List<Task>> getTasksByUser(String userId) async {
+    final allTasks = await getAllTasks();
+    final tasksByProject =
+        allTasks.where((task) => task.assignee == userId).toList();
     for (var task in tasksByProject) {
       print(task);
     }
@@ -155,15 +182,16 @@ class TrackerService {
       },
       body: jsonEncode(requestBody),
     );
+    var responseBody = utf8.decode(response.bodyBytes);
 
     switch (response.statusCode) {
       case 200:
         return;
       case 404:
-        final errorData = jsonDecode(response.body);
+        final errorData = jsonDecode(responseBody);
         throw Exception('Проект не найден: ${errorData['message']}');
       case 400:
-        final errorData = jsonDecode(response.body);
+        final errorData = jsonDecode(responseBody);
         throw Exception('Ошибка валидации: ${errorData['message']}');
       default:
         throw Exception(
@@ -193,6 +221,8 @@ class TrackerService {
     String? projectName,
     String? assignee,
     String? status,
+    String? startDate,
+    String? endDate,
   }) async {
     final String? token = await UserPreferences.getToken();
     if (token == null) {
@@ -215,15 +245,16 @@ class TrackerService {
       },
       body: jsonEncode(requestBody),
     );
+    var responseBody = utf8.decode(response.bodyBytes);
 
     switch (response.statusCode) {
       case 200:
         return;
       case 400:
-        final errorData = jsonDecode(response.body);
+        final errorData = jsonDecode(responseBody);
         throw Exception('Ошибка валидации: ${errorData['message']}');
       case 404:
-        final errorData = jsonDecode(response.body);
+        final errorData = jsonDecode(responseBody);
         throw Exception('Задача не найдена: ${errorData['message']}');
       default:
         throw Exception(
@@ -232,7 +263,11 @@ class TrackerService {
   }
 
   static Future<void> createProject(String projectName) async {
-    final token = await UserPreferences.getToken();
+    final String? token = await UserPreferences.getToken();
+    if (token == null) {
+      throw Exception('Токен авторизации отсутствует');
+    }
+
     final response = await http.post(
       Uri.parse('https://working-day.su:8080/v1/tracker/projects/add'),
       headers: {
@@ -241,9 +276,16 @@ class TrackerService {
       },
       body: jsonEncode({'project_name': projectName}),
     );
+    var responseBody = utf8.decode(response.bodyBytes);
 
-    if (response.statusCode != 200) {
-      throw Exception('Ошибка создания проекта');
+    if (response.statusCode == 200) {
+      return;
+    } else if (response.statusCode == 400) {
+      final errorData = jsonDecode(responseBody);
+      throw Exception('Ошибка: ${errorData['message']}');
+    } else {
+      throw Exception(
+          'Ошибка создания проекта: ${response.statusCode} ${response.reasonPhrase}');
     }
   }
 }

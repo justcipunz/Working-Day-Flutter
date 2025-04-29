@@ -31,6 +31,9 @@ class _TaskPageState extends State<TaskPage> {
   final _projectController = TextEditingController();
   final _assigneeController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _startDateController = TextEditingController();
+  final _endDateController = TextEditingController();
+  String? _selectedStatus;
 
   @override
   void initState() {
@@ -54,7 +57,12 @@ class _TaskPageState extends State<TaskPage> {
 
     try {
       final task = await TrackerService.getTaskInfo(widget.taskId!);
-      setState(() => _task = task);
+      setState(() {
+        _task = task;
+        _selectedStatus = task.status;
+        _startDateController.text = task.startDate;
+        _endDateController.text = task.endDate;
+      });
     } catch (e) {
       setState(() => _errorMessage = e.toString());
     } finally {
@@ -67,7 +75,9 @@ class _TaskPageState extends State<TaskPage> {
     setState(() {
       _task = Task.empty().copyWith(
         creator: me.id ?? 'Неизвестный',
+        status: 'Новая',
       );
+      _selectedStatus = _task.status;
     });
   }
 
@@ -86,6 +96,9 @@ class _TaskPageState extends State<TaskPage> {
         projectName: _projectController.text,
         assignee: _assigneeController.text,
         description: _descriptionController.text,
+        startDate: _startDateController.text,
+        endDate: _endDateController.text,
+        status: _selectedStatus,
       );
       setState(() {
         _mode = TaskPageMode.view;
@@ -94,6 +107,9 @@ class _TaskPageState extends State<TaskPage> {
           projectName: _projectController.text,
           assignee: _assigneeController.text,
           description: _descriptionController.text,
+          startDate: _startDateController.text,
+          endDate: _endDateController.text,
+          status: _selectedStatus,
         );
       });
     } catch (e) {
@@ -155,7 +171,7 @@ class _TaskPageState extends State<TaskPage> {
 
   Widget _buildContent() {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator(color: Color(0xFF164F94)));
     }
 
     if (_errorMessage != null) {
@@ -201,16 +217,71 @@ class _TaskPageState extends State<TaskPage> {
           text: _mode == TaskPageMode.edit
               ? "Редактировать задачу"
               : "Создать задачу",
-          padding: EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: 10),
         ),
         _buildEditableField('Название*', _titleController),
         const SizedBox(height: 20),
         _buildEditableField('Проект*', _projectController),
         const SizedBox(height: 20),
+        Row(
+          children: [
+            Expanded(
+              child: _buildEditableField('Начало', _startDateController),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _buildEditableField('Окончание', _endDateController),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        if (_mode == TaskPageMode.edit) _buildStatusDropdown(),
+        const SizedBox(height: 20),
         _buildEditableField('Ответственный', _assigneeController),
         const SizedBox(height: 20),
         _buildEditableField('Описание', _descriptionController, maxLines: 5),
       ],
+    );
+  }
+
+  Widget _buildStatusDropdown() {
+    const statusOptions = ['Новая', 'В работе', 'На рассмотрении', 'Выполнено'];
+
+    return InputDecorator(
+      decoration: InputDecoration(
+        labelText: 'Статус',
+        border: const OutlineInputBorder(),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: _selectedStatus,
+          isExpanded: true,
+          dropdownColor: Colors.white,
+          style: TextStyle(
+            color: Colors.grey[800],
+            fontSize: 16,
+          ),
+          icon: Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
+          items: statusOptions
+              .map((status) => DropdownMenuItem(
+                    value: status,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                        status,
+                        style: TextStyle(
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                    ),
+                  ))
+              .toList(),
+          onChanged: (value) => setState(() => _selectedStatus = value),
+        ),
+      ),
     );
   }
 
@@ -318,8 +389,14 @@ class _TaskPageState extends State<TaskPage> {
     return TextField(
       controller: controller..text = _getFieldValue(label),
       decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white,
         labelText: label,
         border: const OutlineInputBorder(),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 16,
+        ),
       ),
       maxLines: maxLines,
     );
@@ -335,6 +412,10 @@ class _TaskPageState extends State<TaskPage> {
         return _task.assignee;
       case 'Описание':
         return _task.description;
+      case 'Начало':
+        return _task.startDate;
+      case 'Окончание':
+        return _task.endDate;
       default:
         return '';
     }
@@ -370,6 +451,8 @@ class _TaskPageState extends State<TaskPage> {
     _projectController.dispose();
     _assigneeController.dispose();
     _descriptionController.dispose();
+    _startDateController.dispose();
+    _endDateController.dispose();
     super.dispose();
   }
 }

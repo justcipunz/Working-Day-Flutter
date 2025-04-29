@@ -5,9 +5,9 @@ class Task {
   final String description;
   final String creator;
   final String assignee;
-  final String status; // "Open", "InProgress", "Review", "Done"
-  final String startDate;
-  final String endDate;
+  String status; // "Open", "InProgress", "Review", "Done"
+  String startDate;
+  String endDate;
   final bool isUrgent;
   final List<String>? mediaLinks;
 

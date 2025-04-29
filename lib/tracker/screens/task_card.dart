@@ -91,7 +91,7 @@ class TaskCard extends StatelessWidget {
       MaterialPageRoute(
           builder: (context) => TaskPage(
                 taskId: task.id,
-                isAdmin: true, // FIX LATER!!
+                isAdmin: task.projectName.length % 2 == 0, // FIX LATER!!
               )),
     );
   }

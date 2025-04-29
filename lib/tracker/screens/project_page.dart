@@ -25,7 +25,11 @@ class _ProjectPageState extends State<ProjectPage> {
 
   Future<List<Project>> _loadProjects() async {
     try {
-      return await TrackerService.getAllProjects();
+      var projects = await TrackerService.getAllProjects();
+      projects =
+          projects.where((project) => project.name.contains('К')).toList();
+      projects.sort((a, b) => a.name.compareTo(b.name));
+      return projects;
     } catch (e) {
       print('Ошибка загрузки проектов: $e');
       rethrow;
@@ -35,6 +39,7 @@ class _ProjectPageState extends State<ProjectPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: _buildAddProjectButton(),
       body: FutureBuilder<List<Project>>(
         future: _projectsFuture,
         builder: (context, snapshot) {
@@ -52,9 +57,73 @@ class _ProjectPageState extends State<ProjectPage> {
     );
   }
 
+  Future<void> _showCreateProjectDialog() async {
+    final TextEditingController controller = TextEditingController();
+    final result = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Создать новый проект'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            labelText: 'Название проекта',
+            hintText: 'Введите название проекта',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Отмена'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, controller.text),
+            child: const Text('Создать'),
+          ),
+        ],
+      ),
+    );
+
+    if (result != null && result is String) {
+      await _createProject(result);
+    }
+  }
+
+  Future<void> _createProject(String projectName) async {
+    try {
+      await TrackerService.createProject(projectName);
+
+      setState(() {
+        _projectsFuture = _loadProjects();
+      });
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Ошибка'),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  Widget _buildAddProjectButton() {
+    return selectedProject == null
+        ? FloatingActionButton(
+            onPressed: _showCreateProjectDialog,
+            child: const Icon(Icons.add),
+          )
+        : SizedBox();
+  }
+
   Widget _buildContent(AsyncSnapshot<List<Project>> snapshot) {
     if (snapshot.connectionState == ConnectionState.waiting) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator(color: Color(0xFF164F94)));
     }
 
     if (snapshot.hasError) {

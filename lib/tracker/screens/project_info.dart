@@ -151,7 +151,10 @@ class _ProjectInfoState extends State<ProjectInfo> {
       future: _tasksFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            heightFactor: 10,
+            child: CircularProgressIndicator(color: Color(0xFF164F94)),
+          );
         }
 
         if (snapshot.hasError) {
