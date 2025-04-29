@@ -94,19 +94,7 @@ class _ProjectInfoState extends State<ProjectInfo> {
             context,
             MaterialPageRoute(
               builder: (context) => TaskPage(
-                task: Task(
-                  id: "",
-                  title: "",
-                  startDate: "",
-                  endDate: "",
-                  projectName: widget.project.name,
-                  status: "Новая",
-                  isUrgent: false,
-                  assignee: "",
-                  creator: "",
-                  description: "",
-                ),
-                isNew: true,
+                isAdmin: true,
               ),
             ),
           );

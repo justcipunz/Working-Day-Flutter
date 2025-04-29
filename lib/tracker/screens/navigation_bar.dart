@@ -16,19 +16,7 @@ class MyNavigationBar extends StatelessWidget {
     final page = switch (index) {
       0 => HomePage(),
       1 => TaskPage(
-          task: Task(
-            id: "1",
-            title: "Задача 3",
-            startDate: "09/12/2024",
-            endDate: "13/12/2024",
-            projectName: "Мобильное приложение для вуза",
-            isUrgent: true,
-            assignee: "@akazhkarimov - Асхат Кажкаримов",
-            creator: "@iisypov - Ilya Isypov",
-            status: "В работе",
-            description: "Нужно решить задачу №2 по поводу...",
-            mediaLinks: List.empty(),
-          ),
+          isAdmin: false,
         ),
       2 => ProjectPage(),
       _ => throw Exception('Invalid index'),

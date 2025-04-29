@@ -15,17 +15,6 @@ class ServicesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text(
-          'Сервисы',
-          style: TextStyle(
-            fontFamily: 'CeraPro',
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
       body: SafeArea(
         child: Navigator(
           key: _navigatorKey,

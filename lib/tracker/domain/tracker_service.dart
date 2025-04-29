@@ -28,6 +28,32 @@ class TrackerService {
     }
   }
 
+  static Future<Task> getTaskInfo(String taskId) async {
+    final String? token = await UserPreferences.getToken();
+    if (token == null) {
+      throw Exception('Токен авторизации отсутствует');
+    }
+
+    final response = await http.get(
+      Uri.parse('https://working-day.su:8080/v1/tracker/tasks/info')
+          .replace(queryParameters: {'task_id': taskId}),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return Task.fromJson(data);
+    } else if (response.statusCode == 400) {
+      final errorData = jsonDecode(response.body);
+      throw Exception('Некорректный запрос: ${errorData['message']}');
+    } else if (response.statusCode == 404) {
+      throw Exception('Задача с ID $taskId не найдена');
+    } else {
+      throw Exception(
+          'Ошибка получения информации о задаче: ${response.statusCode}');
+    }
+  }
+
   static Future<List<Task>> getAssignedTasks(String employeeId) async {
     final String? token = await UserPreferences.getToken();
     if (token == null) {
@@ -99,6 +125,110 @@ class TrackerService {
       print(task);
     }
     return tasksByProject;
+  }
+
+  static Future<void> createTask({
+    required String title,
+    required String projectName,
+    required String creator,
+    String? description,
+    String? assignee,
+  }) async {
+    final String? token = await UserPreferences.getToken();
+    if (token == null) {
+      throw Exception('Токен авторизации отсутствует');
+    }
+
+    final Map<String, dynamic> requestBody = {
+      'title': title,
+      'project_name': projectName,
+      'creator': creator,
+      if (description != null) 'description': description,
+      if (assignee != null) 'assignee': assignee,
+    };
+
+    final response = await http.post(
+      Uri.parse('https://working-day.su:8080/v1/tracker/tasks/add'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(requestBody),
+    );
+
+    switch (response.statusCode) {
+      case 200:
+        return;
+      case 404:
+        final errorData = jsonDecode(response.body);
+        throw Exception('Проект не найден: ${errorData['message']}');
+      case 400:
+        final errorData = jsonDecode(response.body);
+        throw Exception('Ошибка валидации: ${errorData['message']}');
+      default:
+        throw Exception(
+            'Ошибка создания задачи: ${response.statusCode} ${response.reasonPhrase}');
+    }
+  }
+
+  static String _convertStatusToApi(String status) {
+    switch (status) {
+      case 'Новая':
+        return 'Open';
+      case 'В работе':
+        return 'InProgress';
+      case 'На рассмотрении':
+        return 'Review';
+      case 'Выполнено':
+        return 'Done';
+      default:
+        return 'Open';
+    }
+  }
+
+  static Future<void> editTask({
+    required String taskId,
+    String? title,
+    String? description,
+    String? projectName,
+    String? assignee,
+    String? status,
+  }) async {
+    final String? token = await UserPreferences.getToken();
+    if (token == null) {
+      throw Exception('Токен авторизации отсутствует');
+    }
+
+    final Map<String, dynamic> requestBody = {};
+    if (title != null) requestBody['title'] = title;
+    if (description != null) requestBody['description'] = description;
+    if (projectName != null) requestBody['project_name'] = projectName;
+    if (assignee != null) requestBody['assignee'] = assignee;
+    if (status != null) requestBody['status'] = _convertStatusToApi(status);
+
+    final response = await http.post(
+      Uri.parse('https://working-day.su:8080/v1/tracker/tasks/edit')
+          .replace(queryParameters: {'task_id': taskId}),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(requestBody),
+    );
+
+    switch (response.statusCode) {
+      case 200:
+        return;
+      case 400:
+        final errorData = jsonDecode(response.body);
+        throw Exception('Ошибка валидации: ${errorData['message']}');
+      case 404:
+        final errorData = jsonDecode(response.body);
+        throw Exception('Задача не найдена: ${errorData['message']}');
+      default:
+        throw Exception(
+            'Ошибка обновления задачи: ${response.statusCode} ${response.reasonPhrase}');
+    }
   }
 
   static Future<void> createProject(String projectName) async {

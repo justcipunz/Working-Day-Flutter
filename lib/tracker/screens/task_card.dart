@@ -49,15 +49,11 @@ class TaskCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-
-              _buildInfoRow(Icons.access_time, 
-                "${task.startDate} → ${task.endDate}"),
-              
+              _buildInfoRow(
+                  Icons.access_time, "${task.startDate} → ${task.endDate}"),
               _buildInfoRow(Icons.circle, task.status),
-
-              if (showProject) 
+              if (showProject)
                 _buildInfoRow(Icons.work_outline, task.projectName),
-
               if (showResponsible)
                 _buildInfoRow(Icons.person_outline, task.assignee),
             ],
@@ -92,7 +88,11 @@ class TaskCard extends StatelessWidget {
   void _openTaskDetails(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => TaskPage(task: task)),
+      MaterialPageRoute(
+          builder: (context) => TaskPage(
+                taskId: task.id,
+                isAdmin: true, // FIX LATER!!
+              )),
     );
   }
 }

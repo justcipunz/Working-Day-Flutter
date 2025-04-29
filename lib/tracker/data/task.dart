@@ -49,7 +49,7 @@ class Task {
       description: (json['description'] as String?) ?? '',
       creator: (json['creator'] as String?) ?? 'Неизвестный',
       assignee: (json['assignee'] as String?) ?? '',
-      status: _mapStatus(json['status'] as String?),
+      status: _convertStatusFromApi(json['status'] as String?),
       mediaLinks: (json['media_links'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
@@ -60,7 +60,7 @@ class Task {
     );
   }
 
-  static String _mapStatus(String? apiStatus) {
+  static String _convertStatusFromApi(String? apiStatus) {
     switch (apiStatus) {
       case 'Open':
         return 'Новая';
@@ -75,8 +75,61 @@ class Task {
     }
   }
 
+  factory Task.empty() => Task(
+        id: '',
+        title: '',
+        projectName: '',
+        description: '',
+        creator: '',
+        assignee: '',
+        status: 'Новая',
+        startDate: '',
+        endDate: '',
+        isUrgent: false,
+        mediaLinks: [],
+      );
+
+  Task copyWith({
+    String? id,
+    String? title,
+    String? projectName,
+    String? description,
+    String? creator,
+    String? assignee,
+    String? status,
+    String? startDate,
+    String? endDate,
+    bool? isUrgent,
+    List<String>? mediaLinks,
+  }) {
+    return Task(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      projectName: projectName ?? this.projectName,
+      description: description ?? this.description,
+      creator: creator ?? this.creator,
+      assignee: assignee ?? this.assignee,
+      status: status ?? this.status,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      isUrgent: isUrgent ?? this.isUrgent,
+      mediaLinks: mediaLinks ?? this.mediaLinks,
+    );
+  }
+
   @override
   String toString() {
-    return "TASK: $title; TASK_ID: $id; PROJECT: $projectName";
+    return '''
+Task {
+  id: $id,
+  title: $title,
+  project: $projectName,
+  status: $status,
+  creator: $creator,
+  assignee: $assignee,
+  startDate: $startDate,
+  endDate: $endDate,
+  description: ${description.length > 20 ? '${description.substring(0, 17)}...' : description},
+}''';
   }
 }
